@@ -1,3 +1,5 @@
+import json
+
 import requests
 
 
@@ -7,4 +9,14 @@ def emotion_detector(text_to_analyze):
     payload = {"raw_document": {"text": text_to_analyze}}
 
     response = requests.post(url, json=payload, headers=headers, timeout=10)
-    return response.text
+
+    emotions = json.loads(response.text)["emotionPredictions"][0]["emotion"]
+    scores = {
+        "anger": emotions["anger"],
+        "disgust": emotions["disgust"],
+        "fear": emotions["fear"],
+        "joy": emotions["joy"],
+        "sadness": emotions["sadness"],
+    }
+    scores["dominant_emotion"] = max(scores, key=scores.get)
+    return scores
